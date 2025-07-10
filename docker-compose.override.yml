@@ -1,0 +1,42 @@
+# このファイルは開発者個人の設定用です
+# 個人の設定を追加する場合は、このファイルを編集してください
+# このファイルはGitにコミットされません
+
+version: '3.8'
+
+services:
+  frontend:
+    # 個人の設定を追加
+    # environment:
+    #   - CUSTOM_VAR=value
+    
+    # 追加のボリュームマウント
+    # volumes:
+    #   - ./custom-configs:/app/configs
+    
+    # 追加のポート設定
+    # ports:
+    #   - "3001:3000"
+    
+  backend:
+    # 個人の設定を追加
+    # environment:
+    #   - DEBUG=true
+    #   - LOG_LEVEL=debug
+    
+    # 追加のボリュームマウント
+    # volumes:
+    #   - ./custom-configs:/app/configs
+    
+    # 追加のポート設定
+    # ports:
+    #   - "8081:8080"
+    
+  postgres:
+    # 個人のデータベース設定
+    # environment:
+    #   - POSTGRES_INITDB_ARGS=--auth-host=scram-sha-256
+    
+    # 追加のボリュームマウント
+    # volumes:
+    #   - ./custom-db-init:/docker-entrypoint-initdb.d/custom

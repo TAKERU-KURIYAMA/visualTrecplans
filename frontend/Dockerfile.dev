@@ -1,0 +1,19 @@
+FROM node:18-alpine
+
+# 作業ディレクトリの設定
+WORKDIR /app
+
+# 依存関係の管理を最適化
+COPY package*.json ./
+
+# 依存関係のインストール
+RUN npm ci --only=production=false
+
+# アプリケーションのコピー
+COPY . .
+
+# 開発用ポートの公開
+EXPOSE 3000
+
+# 開発サーバーの起動
+CMD ["npm", "run", "dev"]
