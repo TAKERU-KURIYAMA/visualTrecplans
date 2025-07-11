@@ -1,0 +1,39 @@
+{
+  "recommendations": [
+    // TypeScript/JavaScript開発
+    "bradlc.vscode-tailwindcss",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "ms-vscode.vscode-typescript-next",
+    
+    // React開発
+    "ms-vscode.vscode-react-devtools",
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense",
+    
+    // CSS/Tailwind
+    "bradlc.vscode-tailwindcss",
+    "csstools.postcss",
+    
+    // Git
+    "eamodio.gitlens",
+    "github.vscode-github-actions",
+    
+    // Docker
+    "ms-azuretools.vscode-docker",
+    
+    // その他の開発支援
+    "ms-vscode.vscode-json",
+    "redhat.vscode-yaml",
+    "gruntfuggly.todo-tree",
+    "streetsidesoftware.code-spell-checker",
+    "ms-vscode.vscode-npm-scripts",
+    
+    // 日本語対応
+    "ms-ceintl.vscode-language-pack-ja"
+  ],
+  "unwantedRecommendations": [
+    "hookyqr.beautify",
+    "ms-vscode.vscode-typescript"
+  ]
+}
