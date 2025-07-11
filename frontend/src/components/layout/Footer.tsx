@@ -11,11 +11,9 @@ export const Footer = () => {
               ビジュアル重視のトレーニング・サプリ管理アプリケーション
             </p>
           </div>
-          
+
           <div>
-            <h4 className="text-sm font-semibold text-gray-900 mb-4">
-              機能
-            </h4>
+            <h4 className="text-sm font-semibold text-gray-900 mb-4">機能</h4>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>トレーニング記録</li>
               <li>サプリメント管理</li>
@@ -23,7 +21,7 @@ export const Footer = () => {
               <li>人体図UI</li>
             </ul>
           </div>
-          
+
           <div>
             <h4 className="text-sm font-semibold text-gray-900 mb-4">
               サポート
@@ -35,11 +33,9 @@ export const Footer = () => {
               <li>プライバシーポリシー</li>
             </ul>
           </div>
-          
+
           <div>
-            <h4 className="text-sm font-semibold text-gray-900 mb-4">
-              言語
-            </h4>
+            <h4 className="text-sm font-semibold text-gray-900 mb-4">言語</h4>
             <ul className="space-y-2 text-sm text-gray-600">
               <li>日本語</li>
               <li>English</li>
@@ -48,7 +44,7 @@ export const Footer = () => {
             </ul>
           </div>
         </div>
-        
+
         <div className="mt-8 pt-8 border-t border-gray-200">
           <p className="text-center text-sm text-gray-500">
             © 2025 VisualTrecplans. All rights reserved.

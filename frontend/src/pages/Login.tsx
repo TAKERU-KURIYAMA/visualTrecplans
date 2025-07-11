@@ -5,7 +5,7 @@ import { z } from 'zod'
 
 const loginSchema = z.object({
   email: z.string().email('有効なメールアドレスを入力してください'),
-  password: z.string().min(8, 'パスワードは8文字以上で入力してください')
+  password: z.string().min(8, 'パスワードは8文字以上で入力してください'),
 })
 
 type LoginFormData = z.infer<typeof loginSchema>
@@ -14,9 +14,9 @@ export const Login = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema)
+    resolver: zodResolver(loginSchema),
   })
 
   const onSubmit = async (data: LoginFormData) => {
@@ -41,11 +41,14 @@ export const Login = () => {
             </Link>
           </p>
         </div>
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 メールアドレス
               </label>
               <input
@@ -57,12 +60,17 @@ export const Login = () => {
                 placeholder="メールアドレスを入力"
               />
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.email.message}
+                </p>
               )}
             </div>
-            
+
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 パスワード
               </label>
               <input
@@ -74,7 +82,9 @@ export const Login = () => {
                 placeholder="パスワードを入力"
               />
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.password.message}
+                </p>
               )}
             </div>
           </div>
@@ -87,15 +97,25 @@ export const Login = () => {
                 type="checkbox"
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+              <label
+                htmlFor="remember-me"
+                className="ml-2 block text-sm text-gray-900"
+              >
                 ログイン状態を保持
               </label>
             </div>
 
             <div className="text-sm">
-              <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+              <button
+                type="button"
+                onClick={() => {
+                  // TODO: パスワードリセット機能を実装
+                  console.log('Password reset requested')
+                }}
+                className="font-medium text-blue-600 hover:text-blue-500"
+              >
                 パスワードを忘れた場合
-              </a>
+              </button>
             </div>
           </div>
 

@@ -4,7 +4,13 @@
       "Bash(mkdir:*)",
       "Bash(ls:*)",
       "Bash(chmod:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(npx husky:*)",
+      "Bash(npm run lint)",
+      "Bash(rm:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npm run format:*)",
+      "Bash(npm run type-check:*)"
     ],
     "deny": []
   }

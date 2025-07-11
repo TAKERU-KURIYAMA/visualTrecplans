@@ -14,12 +14,14 @@ export const useDarkMode = () => {
   useEffect(() => {
     const applyTheme = (selectedTheme: Theme) => {
       const root = window.document.documentElement
-      
+
       if (selectedTheme === 'system') {
         // システムの設定を使用
-        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        const systemPrefersDark = window.matchMedia(
+          '(prefers-color-scheme: dark)'
+        ).matches
         setIsDark(systemPrefersDark)
-        
+
         if (systemPrefersDark) {
           root.classList.add('dark')
         } else {
@@ -29,7 +31,7 @@ export const useDarkMode = () => {
         // 明示的なテーマ設定
         const isDarkTheme = selectedTheme === 'dark'
         setIsDark(isDarkTheme)
-        
+
         if (isDarkTheme) {
           root.classList.add('dark')
         } else {

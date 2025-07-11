@@ -36,6 +36,16 @@
   "typescript.preferences.importModuleSpecifier": "relative",
   "typescript.suggest.autoImports": true,
   "typescript.updateImportsOnFileMove.enabled": "always",
+  
+  // ESLint設定
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.workingDirectories": ["frontend"],
+  "eslint.codeActionsOnSave.mode": "all",
 
   // Tailwind CSS設定
   "tailwindCSS.includeLanguages": {

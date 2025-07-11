@@ -1,4 +1,8 @@
-import { SunIcon, MoonIcon, ComputerDesktopIcon } from '@heroicons/react/24/outline'
+import {
+  SunIcon,
+  MoonIcon,
+  ComputerDesktopIcon,
+} from '@heroicons/react/24/outline'
 import { useDarkMode } from '@/hooks/useDarkMode'
 
 export const ThemeToggle = () => {

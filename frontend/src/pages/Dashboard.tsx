@@ -1,8 +1,8 @@
-import { 
-  ChartBarIcon, 
-  HeartIcon, 
-  ClockIcon, 
-  TrophyIcon 
+import {
+  ChartBarIcon,
+  HeartIcon,
+  ClockIcon,
+  TrophyIcon,
 } from '@heroicons/react/24/outline'
 
 export const Dashboard = () => {
@@ -13,7 +13,7 @@ export const Dashboard = () => {
       value: '24',
       unit: '回',
       change: '+12%',
-      changeType: 'positive'
+      changeType: 'positive',
     },
     {
       icon: HeartIcon,
@@ -21,7 +21,7 @@ export const Dashboard = () => {
       value: '85',
       unit: '%',
       change: '+5%',
-      changeType: 'positive'
+      changeType: 'positive',
     },
     {
       icon: ClockIcon,
@@ -29,7 +29,7 @@ export const Dashboard = () => {
       value: '72',
       unit: '分',
       change: '+8%',
-      changeType: 'positive'
+      changeType: 'positive',
     },
     {
       icon: TrophyIcon,
@@ -37,8 +37,8 @@ export const Dashboard = () => {
       value: '15',
       unit: '日',
       change: '+3日',
-      changeType: 'positive'
-    }
+      changeType: 'positive',
+    },
   ]
 
   const recentWorkouts = [
@@ -46,29 +46,27 @@ export const Dashboard = () => {
       date: '2025-01-10',
       type: 'チェスト',
       duration: '65分',
-      exercises: 4
+      exercises: 4,
     },
     {
       date: '2025-01-08',
       type: 'バック',
       duration: '70分',
-      exercises: 5
+      exercises: 5,
     },
     {
       date: '2025-01-06',
       type: 'レッグ',
       duration: '80分',
-      exercises: 6
-    }
+      exercises: 6,
+    },
   ]
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container py-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">
-            ダッシュボード
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900">ダッシュボード</h1>
           <p className="mt-2 text-gray-600">
             あなたのフィットネス記録を確認しましょう
           </p>
@@ -83,16 +81,22 @@ export const Dashboard = () => {
                   <stat.icon className="h-8 w-8 text-blue-600" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">{stat.name}</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    {stat.name}
+                  </p>
                   <p className="text-2xl font-bold text-gray-900">
                     {stat.value}
                     <span className="text-sm font-normal text-gray-500 ml-1">
                       {stat.unit}
                     </span>
                   </p>
-                  <p className={`text-sm ${
-                    stat.changeType === 'positive' ? 'text-green-600' : 'text-red-600'
-                  }`}>
+                  <p
+                    className={`text-sm ${
+                      stat.changeType === 'positive'
+                        ? 'text-green-600'
+                        : 'text-red-600'
+                    }`}
+                  >
                     {stat.change} 先月比
                   </p>
                 </div>
@@ -109,14 +113,21 @@ export const Dashboard = () => {
             </h2>
             <div className="space-y-4">
               {recentWorkouts.map((workout, index) => (
-                <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                >
                   <div>
                     <p className="font-medium text-gray-900">{workout.type}</p>
                     <p className="text-sm text-gray-600">{workout.date}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-medium text-gray-900">{workout.duration}</p>
-                    <p className="text-sm text-gray-600">{workout.exercises} 種目</p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {workout.duration}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {workout.exercises} 種目
+                    </p>
                   </div>
                 </div>
               ))}
@@ -149,11 +160,15 @@ export const Dashboard = () => {
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
                 <HeartIcon className="h-6 w-6 text-blue-600" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900">新しいトレーニング</h3>
-              <p className="text-sm text-gray-600 mt-1">トレーニングを記録する</p>
+              <h3 className="text-lg font-medium text-gray-900">
+                新しいトレーニング
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">
+                トレーニングを記録する
+              </p>
             </div>
           </button>
-          
+
           <button className="card p-6 hover:shadow-md transition-shadow">
             <div className="text-center">
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
@@ -163,7 +178,7 @@ export const Dashboard = () => {
               <p className="text-sm text-gray-600 mt-1">詳細な分析を表示</p>
             </div>
           </button>
-          
+
           <button className="card p-6 hover:shadow-md transition-shadow">
             <div className="text-center">
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3">

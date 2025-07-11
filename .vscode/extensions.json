@@ -5,6 +5,7 @@
     "esbenp.prettier-vscode",
     "dbaeumer.vscode-eslint",
     "ms-vscode.vscode-typescript-next",
+    "typescript-importer.typescript-importer",
     
     // React開発
     "ms-vscode.vscode-react-devtools",
