@@ -13,7 +13,9 @@
       "Bash(npm run type-check:*)",
       "Bash(go mod init:*)",
       "Bash(docker-compose exec:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(touch:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": []
   }

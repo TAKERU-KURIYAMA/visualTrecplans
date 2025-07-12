@@ -2,6 +2,10 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/visualtrecplans/backend/internal/database"
+	"github.com/visualtrecplans/backend/internal/handlers/auth"
+	"github.com/visualtrecplans/backend/internal/middleware"
+	"github.com/visualtrecplans/backend/internal/services"
 	"github.com/visualtrecplans/backend/pkg/config"
 	"github.com/visualtrecplans/backend/pkg/logger"
 )
@@ -19,6 +23,21 @@ func main() {
 		logger.String("environment", cfg.App.Environment),
 	)
 
+	// Connect to database
+	if err := database.Connect(cfg); err != nil {
+		logger.Fatal("Failed to connect to database", logger.Error(err))
+	}
+	defer func() {
+		if err := database.Close(); err != nil {
+			logger.Error("Failed to close database connection", logger.Error(err))
+		}
+	}()
+
+	// Run database migrations
+	if err := database.Migrate(); err != nil {
+		logger.Fatal("Failed to run database migrations", logger.Error(err))
+	}
+
 	// Set Gin mode based on environment
 	if cfg.App.Environment == "production" {
 		gin.SetMode(gin.ReleaseMode)
@@ -27,14 +46,32 @@ func main() {
 	// Create Gin router
 	r := gin.Default()
 
+	// Add security middlewares
+	r.Use(middleware.SecurityHeaders(cfg))
+	r.Use(middleware.CORS())
+	r.Use(middleware.RateLimit())
+	r.Use(middleware.BruteForceProtection())
+
 	// Health check endpoint
 	r.GET("/health", func(c *gin.Context) {
+		// Check database health
+		dbHealth := "ok"
+		if err := database.HealthCheck(); err != nil {
+			dbHealth = "error"
+			logger.Error("Database health check failed", logger.Error(err))
+		}
+
 		c.JSON(200, gin.H{
-			"status":  "ok",
-			"message": "VisualTrecplans API is running",
-			"version": cfg.App.Version,
+			"status":    "ok",
+			"message":   "VisualTrecplans API is running",
+			"version":   cfg.App.Version,
+			"database":  dbHealth,
 		})
 	})
+
+	// Initialize services
+	authService := services.NewAuthService()
+	jwtService := services.NewJWTService(cfg)
 
 	// API v1 routes
 	v1 := r.Group("/api/v1")
@@ -44,6 +81,9 @@ func main() {
 				"message": "pong",
 			})
 		})
+
+		// Authentication routes
+		auth.RegisterRoutes(v1, authService, jwtService)
 	}
 
 	// Start server

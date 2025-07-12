@@ -38,17 +38,37 @@ clean:
 # Run database migrations
 migrate-up:
 	@echo "Running migrations..."
-	@migrate -path ./migrations -database "postgresql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=$(DB_SSLMODE)" up
+	@go run cmd/migrate/main.go -direction=up
 
 # Rollback database migrations
 migrate-down:
 	@echo "Rolling back migrations..."
-	@migrate -path ./migrations -database "postgresql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=$(DB_SSLMODE)" down 1
+	@go run cmd/migrate/main.go -direction=down -steps=1
+
+# Create new migration
+migrate-create:
+	@echo "Creating migration: $(name)"
+	@migrate create -ext sql -dir ./migrations -seq $(name)
+
+# Force migration to specific version
+migrate-force:
+	@echo "Forcing migration to version: $(version)"
+	@go run cmd/migrate/main.go -force=$(version)
+
+# Migrate to specific version
+migrate-version:
+	@echo "Migrating to version: $(version)"
+	@go run cmd/migrate/main.go -version=$(version)
+
+# Drop database (dangerous!)
+migrate-drop:
+	@echo "Dropping database..."
+	@go run cmd/migrate/main.go -drop
 
 # Seed database
 seed:
 	@echo "Seeding database..."
-	@go run ./cmd/seeder
+	@go run cmd/seed/main.go
 
 # Run linter
 lint:
