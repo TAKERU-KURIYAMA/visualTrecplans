@@ -16,12 +16,12 @@ help:
 # Build the application
 build:
 	@echo "Building application..."
-	@go build -o main ./cmd/api
+	@go build -o bin/server ./cmd/main.go
 
 # Run the application
 run:
 	@echo "Running application..."
-	@go run ./cmd/api
+	@go run ./cmd/main.go
 
 # Run tests
 test:
@@ -31,7 +31,7 @@ test:
 # Clean build artifacts
 clean:
 	@echo "Cleaning..."
-	@rm -f main
+	@rm -rf bin/
 	@rm -rf ./tmp
 	@rm -rf ./logs
 

@@ -10,7 +10,10 @@
       "Bash(rm:*)",
       "Bash(npm run lint:*)",
       "Bash(npm run format:*)",
-      "Bash(npm run type-check:*)"
+      "Bash(npm run type-check:*)",
+      "Bash(go mod init:*)",
+      "Bash(docker-compose exec:*)",
+      "Bash(git add:*)"
     ],
     "deny": []
   }
