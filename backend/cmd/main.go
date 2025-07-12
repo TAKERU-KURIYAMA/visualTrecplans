@@ -4,8 +4,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/visualtrecplans/backend/internal/database"
 	"github.com/visualtrecplans/backend/internal/handlers/auth"
+	"github.com/visualtrecplans/backend/internal/handlers/master"
+	"github.com/visualtrecplans/backend/internal/handlers/workout"
 	"github.com/visualtrecplans/backend/internal/middleware"
+	"github.com/visualtrecplans/backend/internal/repositories"
 	"github.com/visualtrecplans/backend/internal/services"
+	"github.com/visualtrecplans/backend/internal/validators"
 	"github.com/visualtrecplans/backend/pkg/config"
 	"github.com/visualtrecplans/backend/pkg/logger"
 )
@@ -43,6 +47,9 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
+	// Setup custom validators
+	validators.SetupCustomValidators()
+
 	// Create Gin router
 	r := gin.Default()
 
@@ -69,9 +76,15 @@ func main() {
 		})
 	})
 
+	// Initialize repositories
+	workoutRepo := repositories.NewWorkoutRepository(database.GetDB())
+	masterRepo := repositories.NewMasterRepository(database.GetDB())
+
 	// Initialize services
 	authService := services.NewAuthService()
 	jwtService := services.NewJWTService(cfg)
+	workoutService := services.NewWorkoutService(workoutRepo, masterRepo, logger.GetLogger())
+	masterService := services.NewMasterService(masterRepo, logger.GetLogger())
 
 	// API v1 routes
 	v1 := r.Group("/api/v1")
@@ -84,6 +97,12 @@ func main() {
 
 		// Authentication routes
 		auth.RegisterRoutes(v1, authService, jwtService)
+
+		// Workout routes
+		workout.RegisterRoutes(v1, workoutService, logger.GetLogger())
+
+		// Master data routes
+		master.RegisterRoutes(v1, masterService, logger.GetLogger())
 	}
 
 	// Start server

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"time"
+	"errors"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -11,11 +12,29 @@ import (
 	"github.com/visualtrecplans/backend/internal/models"
 )
 
+// WorkoutFilter represents filtering options for workout queries
+type WorkoutFilter struct {
+	UserID       uuid.UUID
+	MuscleGroup  string
+	StartDate    time.Time
+	EndDate      time.Time
+	ExerciseName string
+	OrderBy      string
+	Order        string
+	Limit        int
+	Offset       int
+}
+
+// Common repository errors
+var (
+	ErrNotFound = errors.New("record not found")
+)
+
 // WorkoutRepository defines the interface for workout data operations
 type WorkoutRepository interface {
 	Create(ctx context.Context, workout *models.Workout) error
 	FindByID(ctx context.Context, id uuid.UUID) (*models.Workout, error)
-	FindByUserID(ctx context.Context, userID uuid.UUID, limit, offset int) ([]*models.Workout, error)
+	FindByUserID(ctx context.Context, filter *WorkoutFilter) ([]*models.Workout, int64, error)
 	FindByUserIDAndDateRange(ctx context.Context, userID uuid.UUID, startDate, endDate time.Time, limit, offset int) ([]*models.Workout, error)
 	FindByUserIDAndMuscleGroup(ctx context.Context, userID uuid.UUID, muscleGroup string, limit, offset int) ([]*models.Workout, error)
 	Update(ctx context.Context, workout *models.Workout) error
@@ -48,31 +67,70 @@ func (r *workoutRepository) FindByID(ctx context.Context, id uuid.UUID) (*models
 	var workout models.Workout
 	if err := r.db.WithContext(ctx).Where("id = ?", id).First(&workout).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, fmt.Errorf("workout not found")
+			return nil, ErrNotFound
 		}
 		return nil, fmt.Errorf("failed to find workout: %w", err)
 	}
 	return &workout, nil
 }
 
-// FindByUserID finds workouts by user ID with pagination
-func (r *workoutRepository) FindByUserID(ctx context.Context, userID uuid.UUID, limit, offset int) ([]*models.Workout, error) {
+// FindByUserID finds workouts by user ID with filtering and pagination
+func (r *workoutRepository) FindByUserID(ctx context.Context, filter *WorkoutFilter) ([]*models.Workout, int64, error) {
 	var workouts []*models.Workout
+	var total int64
 	
-	query := r.db.WithContext(ctx).Where("user_id = ?", userID)
+	// Build base query
+	query := r.db.WithContext(ctx).Where("user_id = ?", filter.UserID)
 	
-	if limit > 0 {
-		query = query.Limit(limit)
-	}
-	if offset > 0 {
-		query = query.Offset(offset)
-	}
-	
-	if err := query.Order("performed_at DESC").Find(&workouts).Error; err != nil {
-		return nil, fmt.Errorf("failed to find workouts: %w", err)
+	// Apply filters
+	if filter.MuscleGroup != "" {
+		query = query.Where("muscle_group = ?", filter.MuscleGroup)
 	}
 	
-	return workouts, nil
+	if !filter.StartDate.IsZero() {
+		query = query.Where("performed_at >= ?", filter.StartDate)
+	}
+	
+	if !filter.EndDate.IsZero() {
+		query = query.Where("performed_at <= ?", filter.EndDate)
+	}
+	
+	if filter.ExerciseName != "" {
+		query = query.Where("exercise_name ILIKE ?", "%"+filter.ExerciseName+"%")
+	}
+	
+	// Count total records
+	if err := query.Model(&models.Workout{}).Count(&total).Error; err != nil {
+		return nil, 0, fmt.Errorf("failed to count workouts: %w", err)
+	}
+	
+	// Apply ordering
+	orderBy := "performed_at"
+	if filter.OrderBy != "" {
+		orderBy = filter.OrderBy
+	}
+	
+	order := "DESC"
+	if filter.Order != "" {
+		order = filter.Order
+	}
+	
+	query = query.Order(orderBy + " " + order)
+	
+	// Apply pagination
+	if filter.Limit > 0 {
+		query = query.Limit(filter.Limit)
+	}
+	if filter.Offset > 0 {
+		query = query.Offset(filter.Offset)
+	}
+	
+	// Execute query
+	if err := query.Find(&workouts).Error; err != nil {
+		return nil, 0, fmt.Errorf("failed to find workouts: %w", err)
+	}
+	
+	return workouts, total, nil
 }
 
 // FindByUserIDAndDateRange finds workouts by user ID within a date range
