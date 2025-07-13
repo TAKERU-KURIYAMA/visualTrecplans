@@ -32,8 +32,8 @@ import (
     "net/http"
     "strings"
     "github.com/gin-gonic/gin"
-    "github.com/visualtrecplans/backend/pkg/auth"
-    "github.com/visualtrecplans/backend/internal/services"
+    "github.com/trecplans/backend/pkg/auth"
+    "github.com/trecplans/backend/internal/services"
 )
 
 func AuthRequired(jwtUtil auth.JWTUtil, userService services.UserService) gin.HandlerFunc {

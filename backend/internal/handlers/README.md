@@ -29,8 +29,8 @@ package handlers
 import (
     "net/http"
     "github.com/gin-gonic/gin"
-    "github.com/visualtrecplans/backend/internal/services"
-    "github.com/visualtrecplans/backend/internal/validators"
+    "github.com/trecplans/backend/internal/services"
+    "github.com/trecplans/backend/internal/validators"
 )
 
 type AuthHandler struct {

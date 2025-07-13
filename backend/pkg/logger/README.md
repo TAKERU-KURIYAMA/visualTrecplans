@@ -26,7 +26,7 @@ The logger is configured using environment variables:
 ### Basic Logging
 
 ```go
-import "github.com/visualtrecplans/backend/pkg/logger"
+import "github.com/trecplans/backend/pkg/logger"
 
 // Simple messages
 logger.Debug("Debug message")

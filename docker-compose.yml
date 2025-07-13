@@ -12,7 +12,7 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
-      - REACT_APP_API_URL=http://localhost:8080
+      - VITE_API_URL=http://localhost:8080
     depends_on:
       - backend
     healthcheck:
@@ -83,4 +83,4 @@ volumes:
 
 networks:
   default:
-    name: visualtrecplans_network
+    name: trecplans_network

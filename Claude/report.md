@@ -311,7 +311,7 @@ Phase 1の残りのチケット（001-002〜001-008）を順次実装し、プ�
 #### チケット001-007: Go プロジェクト初期化
 
 1. **Goモジュールの初期化**
-   - go.modファイルの作成（`github.com/visualtrecplans/backend`）
+   - go.modファイルの作成（`github.com/trecplans/backend`）
    - Go 1.21の指定とモジュール管理の確立
 
 2. **主要な依存関係のインストール**

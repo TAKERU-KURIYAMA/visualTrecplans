@@ -88,11 +88,11 @@ dev:
 # Docker commands
 docker-build:
 	@echo "Building Docker image..."
-	@docker build -t visualtrecplans-backend .
+	@docker build -t trecplans-backend .
 
 docker-run:
 	@echo "Running Docker container..."
-	@docker run -p 8080:8080 --env-file .env visualtrecplans-backend
+	@docker run -p 8080:8080 --env-file .env trecplans-backend
 
 # Database helpers
 db-create:

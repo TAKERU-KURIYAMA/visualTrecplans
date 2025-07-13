@@ -1,0 +1,55 @@
+# マルチステージビルド: ビルドステージ
+FROM golang:1.21-alpine AS builder
+
+# 必要なパッケージインストール
+RUN apk add --no-cache git ca-certificates tzdata
+
+# 作業ディレクトリ設定
+WORKDIR /app
+
+# Go modules ファイルをコピーして依存関係をダウンロード
+COPY go.mod go.sum ./
+RUN go mod download
+
+# ソースコードをコピー
+COPY . .
+
+# バイナリをビルド（CGO無効、静的リンク）
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+    -ldflags='-w -s -extldflags "-static"' \
+    -a -installsuffix cgo \
+    -o main cmd/main.go
+
+# マイグレーションツールもビルド
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+    -ldflags='-w -s -extldflags "-static"' \
+    -a -installsuffix cgo \
+    -o migrate cmd/migrate/main.go
+
+# 本番ステージ: 最小限のイメージ
+FROM scratch
+
+# タイムゾーンデータとCA証明書をコピー
+COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+
+# バイナリファイルをコピー
+COPY --from=builder /app/main /main
+COPY --from=builder /app/migrate /migrate
+
+# マイグレーションファイルとシードファイルをコピー
+COPY --from=builder /app/migrations /migrations
+COPY --from=builder /app/seeds /seeds
+
+# 実行ユーザー設定（セキュリティ向上）
+USER 65534:65534
+
+# ポート公開
+EXPOSE 8080
+
+# ヘルスチェック設定
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD ["/main", "healthcheck"] || exit 1
+
+# アプリケーション実行
+ENTRYPOINT ["/main"]

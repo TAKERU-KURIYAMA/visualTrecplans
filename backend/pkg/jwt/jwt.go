@@ -55,7 +55,7 @@ func (j *JWTService) GenerateAccessToken(userID uuid.UUID, email string, isActiv
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    j.issuer,
 			Subject:   userID.String(),
-			Audience:  []string{"visualtrecplans"},
+			Audience:  []string{"trecplans"},
 			ExpiresAt: jwt.NewNumericDate(expiresAt),
 			NotBefore: jwt.NewNumericDate(now),
 			IssuedAt:  jwt.NewNumericDate(now),
@@ -85,7 +85,7 @@ func (j *JWTService) GenerateRefreshToken(userID uuid.UUID, email string, isActi
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    j.issuer,
 			Subject:   userID.String(),
-			Audience:  []string{"visualtrecplans"},
+			Audience:  []string{"trecplans"},
 			ExpiresAt: jwt.NewNumericDate(expiresAt),
 			NotBefore: jwt.NewNumericDate(now),
 			IssuedAt:  jwt.NewNumericDate(now),

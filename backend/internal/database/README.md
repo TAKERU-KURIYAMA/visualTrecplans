@@ -61,7 +61,7 @@ func Connect(config Config) (*gorm.DB, error) {
 package database
 
 import (
-    "github.com/visualtrecplans/backend/internal/models"
+    "github.com/trecplans/backend/internal/models"
 )
 
 type UserRepository interface {
@@ -85,7 +85,7 @@ package database
 
 import (
     "gorm.io/gorm"
-    "github.com/visualtrecplans/backend/internal/models"
+    "github.com/trecplans/backend/internal/models"
 )
 
 type userRepository struct {

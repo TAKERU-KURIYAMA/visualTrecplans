@@ -15,7 +15,9 @@
       "Bash(docker-compose exec:*)",
       "Bash(git add:*)",
       "Bash(touch:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(find:*)",
+      "Bash(sed:*)"
     ],
     "deny": []
   }

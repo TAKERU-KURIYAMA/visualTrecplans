@@ -24,7 +24,7 @@ app:
 database:
   host: "localhost"
   port: 5432
-  name: "visualtrecplans"
+  name: "trecplans"
   sslmode: "disable"
 
 jwt:

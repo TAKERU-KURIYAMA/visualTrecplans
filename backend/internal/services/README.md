@@ -29,9 +29,9 @@ package services
 import (
     "errors"
     "time"
-    "github.com/visualtrecplans/backend/internal/models"
-    "github.com/visualtrecplans/backend/internal/database"
-    "github.com/visualtrecplans/backend/pkg/auth"
+    "github.com/trecplans/backend/internal/models"
+    "github.com/trecplans/backend/internal/database"
+    "github.com/trecplans/backend/pkg/auth"
     "golang.org/x/crypto/bcrypt"
 )
 

@@ -1,0 +1,198 @@
+name: Rollback Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to rollback'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - development
+          - production
+      commit_sha:
+        description: 'Commit SHA to rollback to (leave empty for previous deployment)'
+        required: false
+        type: string
+
+jobs:
+  rollback:
+    name: Rollback to Previous Version
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.commit_sha || github.sha }}
+
+      - name: Get deployment info
+        id: deployment-info
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const environment = '${{ github.event.inputs.environment }}';
+            const commitSha = '${{ github.event.inputs.commit_sha }}';
+            
+            // 最新の成功したデプロイメントを取得
+            const deployments = await github.rest.repos.listDeployments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              environment: environment,
+              per_page: 10
+            });
+            
+            let targetDeployment;
+            if (commitSha) {
+              targetDeployment = deployments.data.find(d => d.sha === commitSha);
+            } else {
+              // 最新の成功したデプロイメントを見つける
+              for (const deployment of deployments.data) {
+                const statuses = await github.rest.repos.listDeploymentStatuses({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  deployment_id: deployment.id
+                });
+                
+                if (statuses.data.some(s => s.state === 'success')) {
+                  targetDeployment = deployment;
+                  break;
+                }
+              }
+            }
+            
+            if (!targetDeployment) {
+              throw new Error('No successful deployment found for rollback');
+            }
+            
+            return {
+              sha: targetDeployment.sha,
+              id: targetDeployment.id,
+              environment: environment
+            };
+
+      - name: Create rollback deployment
+        uses: actions/github-script@v7
+        id: rollback-deployment
+        with:
+          script: |
+            const deploymentInfo = ${{ steps.deployment-info.outputs.result }};
+            
+            const deployment = await github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: deploymentInfo.sha,
+              environment: deploymentInfo.environment,
+              description: `Rollback to ${deploymentInfo.sha}`,
+              auto_merge: false
+            });
+            
+            return deployment.data.id;
+
+      - name: Rollback development environment
+        if: github.event.inputs.environment == 'development'
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.DEV_HOST }}
+          username: ${{ secrets.DEV_USERNAME }}
+          key: ${{ secrets.DEV_SSH_KEY }}
+          script: |
+            cd /opt/trecplans
+            
+            # 現在のバージョンをバックアップ
+            docker tag ghcr.io/${{ github.repository }}/backend:latest ghcr.io/${{ github.repository }}/backend:backup-$(date +%Y%m%d_%H%M%S)
+            docker tag ghcr.io/${{ github.repository }}/frontend:latest ghcr.io/${{ github.repository }}/frontend:backup-$(date +%Y%m%d_%H%M%S)
+            
+            # ロールバック先のイメージを取得
+            ROLLBACK_SHA="${{ fromJson(steps.deployment-info.outputs.result).sha }}"
+            docker pull ghcr.io/${{ github.repository }}/backend:develop-${ROLLBACK_SHA}
+            docker pull ghcr.io/${{ github.repository }}/frontend:develop-${ROLLBACK_SHA}
+            
+            # イメージを最新タグに変更
+            docker tag ghcr.io/${{ github.repository }}/backend:develop-${ROLLBACK_SHA} ghcr.io/${{ github.repository }}/backend:latest
+            docker tag ghcr.io/${{ github.repository }}/frontend:develop-${ROLLBACK_SHA} ghcr.io/${{ github.repository }}/frontend:latest
+            
+            # 再デプロイ
+            docker-compose -f docker-compose.dev.yml down
+            docker-compose -f docker-compose.dev.yml up -d
+            
+            # ヘルスチェック
+            sleep 30
+            curl -f http://localhost:8080/health || exit 1
+
+      - name: Rollback production environment
+        if: github.event.inputs.environment == 'production'
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USERNAME }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          script: |
+            cd /opt/trecplans
+            
+            # データベースバックアップ
+            docker-compose exec postgres pg_dump -U trecplans trecplans > rollback_backup_$(date +%Y%m%d_%H%M%S).sql
+            
+            # 現在のバージョンをバックアップ
+            docker tag ghcr.io/${{ github.repository }}/backend:latest ghcr.io/${{ github.repository }}/backend:backup-$(date +%Y%m%d_%H%M%S)
+            docker tag ghcr.io/${{ github.repository }}/frontend:latest ghcr.io/${{ github.repository }}/frontend:backup-$(date +%Y%m%d_%H%M%S)
+            
+            # ロールバック先のイメージを取得
+            ROLLBACK_SHA="${{ fromJson(steps.deployment-info.outputs.result).sha }}"
+            docker pull ghcr.io/${{ github.repository }}/backend:main-${ROLLBACK_SHA}
+            docker pull ghcr.io/${{ github.repository }}/frontend:main-${ROLLBACK_SHA}
+            
+            # イメージを最新タグに変更
+            docker tag ghcr.io/${{ github.repository }}/backend:main-${ROLLBACK_SHA} ghcr.io/${{ github.repository }}/backend:latest
+            docker tag ghcr.io/${{ github.repository }}/frontend:main-${ROLLBACK_SHA} ghcr.io/${{ github.repository }}/frontend:latest
+            
+            # 再デプロイ
+            docker-compose down
+            docker-compose up -d
+            
+            # ヘルスチェック
+            sleep 60
+            curl -f https://api.trecplans.com/health || exit 1
+
+      - name: Update deployment status (success)
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: ${{ steps.rollback-deployment.outputs.result }},
+              state: 'success',
+              environment_url: '${{ github.event.inputs.environment == 'production' && 'https://trecplans.com' || 'https://dev.trecplans.com' }}',
+              description: 'Rollback successful'
+            });
+
+      - name: Update deployment status (failure)
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: ${{ steps.rollback-deployment.outputs.result }},
+              state: 'failure',
+              description: 'Rollback failed'
+            });
+
+      - name: Notify Slack
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          channel: '#deployments'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          text: |
+            🔄 Rollback ${{ job.status }} for ${{ github.event.inputs.environment }}
+            Target SHA: ${{ fromJson(steps.deployment-info.outputs.result).sha }}
+            Triggered by: ${{ github.actor }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

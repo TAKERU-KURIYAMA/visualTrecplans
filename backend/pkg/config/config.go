@@ -100,7 +100,7 @@ func Load() (*Config, error) {
 
 	cfg = &Config{
 		App: AppConfig{
-			Name:        getEnvOrDefault("APP_NAME", "VisualTrecplans"),
+			Name:        getEnvOrDefault("APP_NAME", "Trecplans"),
 			Environment: getEnvOrDefault("APP_ENV", "development"),
 			Version:     getEnvOrDefault("APP_VERSION", "1.0.0"),
 			Debug:       getBoolEnvOrDefault("APP_DEBUG", true),
@@ -139,7 +139,7 @@ func Load() (*Config, error) {
 			SMTPPort:     getIntEnvOrDefault("SMTP_PORT", 587),
 			SMTPUser:     getEnvOrDefault("SMTP_USER", ""),
 			SMTPPassword: getEnvOrDefault("SMTP_PASSWORD", ""),
-			From:         getEnvOrDefault("SMTP_FROM", "noreply@visualtrecplans.com"),
+			From:         getEnvOrDefault("SMTP_FROM", "noreply@trecplans.com"),
 		},
 		Storage: StorageConfig{
 			UploadPath:    getEnvOrDefault("UPLOAD_PATH", "./uploads"),

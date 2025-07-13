@@ -26,8 +26,8 @@ package main
 
 import (
     "log"
-    "github.com/visualtrecplans/backend/internal/handlers"
-    "github.com/visualtrecplans/backend/internal/database"
+    "github.com/trecplans/backend/internal/handlers"
+    "github.com/trecplans/backend/internal/database"
 )
 
 func main() {
